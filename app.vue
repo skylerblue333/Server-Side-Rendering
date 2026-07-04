@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <header>
-      <h1>Enterprise SSR Platform</h1>
+      <h1>Scalable SSR Platform</h1>
       <nav>
         <NuxtLink to="/">Home</NuxtLink>
         <NuxtLink to="/about">About</NuxtLink>
@@ -13,7 +13,7 @@
     </main>
     
     <footer>
-      <p>&copy; 2026 Enterprise Solutions</p>
+      <p>&copy; 2026 Scalable Solutions</p>
     </footer>
   </div>
 </template>
