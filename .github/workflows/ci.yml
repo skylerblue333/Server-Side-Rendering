@@ -1,12 +1,35 @@
-name: CI
-on: [push, pull_request]
+name: ssr-core-ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - run: npm ci
-      - run: npm test
+          node-version: '22'
+      - name: Install
+        run: npm install --ignore-scripts
+      - name: TypeScript build and tests
+        run: npm test
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Runtime smoke
+        run: |
+          PORT=3000 node dist/src/server.js >server.log 2>&1 &
+          pid=$!
+          trap 'kill $pid' EXIT
+          for i in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:3000/healthz | grep -q 'sky-ssr-core'; then exit 0; fi
+            sleep 0.25
+          done
+          cat server.log
+          exit 1
+      - name: Build image
+        run: docker build -t sky-ssr-core:ci .
+      - name: Verify non-root image
+        run: test "$(docker run --rm --entrypoint id sky-ssr-core:ci -u)" != "0"

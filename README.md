@@ -1,44 +1,53 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# Sky SSR Core
 
-## Project profile and code-audit snapshot
+A small server-side rendering boundary for the SKYCOIN4444 engineering portfolio.
 
-**What this is:** **Server-Side-Rendering** is a public repository described as: “Vue.js/Nuxt based SSR application for optimal SEO. #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **TypeScript (2 files), Python (2 files)**.
+## Status
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **22 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+**Engineering beta.** The repository contains a real TypeScript renderer and Node.js HTTP service, with deterministic tests and container verification. It is intentionally narrow rather than claiming a full web framework.
 
-**Implementation evidence:** 2 test-related file(s) detected; 2 dependency or package manifest(s) detected; 2 build/CI/infrastructure signal(s) detected; and 3 documentation or governance file(s) detected. Test filenames observed include `tests/api.test.ts`, `tests/test_main.py`. Dependency or package files include `package.json`, `requirements.txt`. Build, CI, or infrastructure signals include `Dockerfile`, `.github/workflows/ci.yml`.
+## What it does
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+- renders bounded page models to complete HTML documents on the server;
+- escapes active HTML characters in dynamic title, heading, body, and request identifiers;
+- serves a server-rendered home page at `GET /`;
+- exposes `GET /healthz` for liveness checks;
+- emits CSP, clickjacking, MIME-sniffing, and referrer-policy headers;
+- propagates or creates a bounded request ID;
+- runs without runtime npm dependencies.
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+## Local use
 
-**Quality and security note:** No obvious secret-like pattern was detected by the limited static scan; this is not a substitute for a security audit. No TODO/FIXME marker was detected in the scanned text files.
+```bash
+npm install --ignore-scripts
+npm test
+npm start
+curl -i http://127.0.0.1:3000/
+curl -i http://127.0.0.1:3000/healthz
+```
 
----
+Set `PORT` to an integer from 1 through 65535 to change the listener port.
 
-# Server Side Rendering
+## API boundary
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/Server-Side-Rendering?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/Server-Side-Rendering?style=flat-square)
+This product renders fixed application-owned templates. It does **not** accept executable templates, arbitrary JavaScript, filesystem paths, remote URLs, or shell commands from callers.
 
-## 🌟 Overview
-**Server-Side-Rendering** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **TypeScript, Python**.
+The exported `renderPage()` function accepts a page title, heading, body, and optional request ID. Fields are length-bounded and escaped before interpolation.
 
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
+## Verification
 
-## 🛠️ Technology Stack
-- **Primary Domain**: TypeScript, Python
-- **Ecosystem**: SkyCoin4444 Digital Platform
+CI uses Node 22 to compile strict TypeScript, execute the Node test suite, audit production dependencies, smoke-test the HTTP service, build the container, and verify the final image runs as a non-root user.
 
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
+## Security and product boundaries
 
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
+Sky SSR Core is not a replacement for Next.js, Nuxt, Remix, a CDN, a reverse proxy, authentication, authorization, WAF, distributed caching, HTML sanitization for intentionally allowed markup, or a production deployment platform. It renders plain escaped text into an application-owned template.
 
----
-*Powered by SkyCoin4444*
+There is no production deployment, HA, TLS termination, persistence, tenant isolation, session management, or dynamic template engine in this repository. See `SECURITY.md` for the supported threat boundary.
+
+## SKYCOIN4444 integration
+
+The renderer can serve small server-generated surfaces or act as a reference boundary for larger SKYCOIN4444 web services. Integrations should place an authenticated application/reverse proxy in front when protected content is involved and should retain output escaping for all untrusted text.
+
+## License
+
+See `LICENSE`.
