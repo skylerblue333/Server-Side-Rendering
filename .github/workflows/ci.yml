@@ -12,7 +12,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
       - name: Install
         run: npm install --ignore-scripts
       - name: TypeScript build and tests
@@ -33,4 +32,4 @@ jobs:
       - name: Build image
         run: docker build -t sky-ssr-core:ci .
       - name: Verify non-root image
-        run: test "$(docker run --rm sky-ssr-core:ci id -u)" != "0"
+        run: test "$(docker run --rm --entrypoint id sky-ssr-core:ci -u)" != "0"
